@@ -1,0 +1,205 @@
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mongo-pv
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: manual
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /data/mongodb
+# ---
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mongo-pvc
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: manual
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+#   volumeName: mongo-pv
+
+# ---
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: mongo-deployment
+#   labels:
+#     app: mongo
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: mongo
+#   template:
+#     metadata:
+#       labels:
+#         app: mongo
+#     spec:
+#       containers:
+#         - name: mongo
+#           image: mongo
+#           env:
+#             - name: MONGO_INITDB_ROOT_USERNAME
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-secret
+#                   key: mongo-user
+#             - name: MONGO_INITDB_ROOT_PASSWORD
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: mongo-secret
+#                   key: mongo-password
+#           ports:
+#             - containerPort: 27017
+#           volumeMounts:
+#             - name: mongo-volume-mount
+#               mountPath: /var/lib/mongodb/data
+#       volumes:
+#         - name: mongo-volume-mount
+#           persistentVolumeClaim:
+#             claimName: mongo-pvc
+
+# ---
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: mongo-service
+# spec:
+#   selector:
+#     app: mongo
+#   ports:
+#     - protocol: TCP
+#       port: 27017
+#       targetPort: 27017
+# ---
+
+
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  namespace: lumina
+  labels:
+    app: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+      - name: mongo
+        image: mongo:4.0
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+         - name: my-volume
+           mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+      volumes:
+        - name: my-volume
+          persistentVolumeClaim:
+            claimName: mongodb-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+  namespace: lumina
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      
+   
+---
+
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: mongodb-pv
+#   labels:
+#     type: local
+# spec:
+#   storageClassName: standard
+#   capacity:
+#     storage: 1Gi
+#   accessModes:
+#     - ReadWriteOnce
+#   hostPath:
+#     path: /var/lib/mongodb/data
+
+
+---   
+
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mongodb-pvc
+#   labels:
+#     type: local        
+# spec:
+#   storageClassName: manual 
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
+# volumeName: mongodb-pv
+ 
+
+
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-pvc
+  namespace: lumina
+  labels:
+    type: local        
+spec:
+  storageClassName: standard    
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
