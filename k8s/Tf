@@ -1,0 +1,9 @@
+Terraform
+
+# aws configure --profile "Kailas"
+
+	#tf apply -var-file=dev.tfvars 
+	#tf apply -var="env=staging"
+
+*Eks by Terraform 
+##13-EKS-IRSA/02-eks-irsa-demo-terraform-manifests  ---jenkins repo name to refer
