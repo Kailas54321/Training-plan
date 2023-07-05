@@ -1,0 +1,71 @@
+Docker
+
+# docker pull <image name>
+# docker run <image name>
+# docker build .  ---to build dockerfile
+# docker ps 
+# docker ps -a
+# docker run -d <image name>
+# docker inspect <c Id>
+# docker run -d -P <image name>     ---map a random port
+# docker run -d -p 8080:80    ---map port 8080 to 80
+# docker images
+# docker kill <id>
+# docker rm <cont_id>   ---to remove exited state container
+# docker rmi -f $(docker images -q )      --to remove all stop images
+# sudo docker rm $(docker ps -a -q)       ---to remove all stop containers
+# docker ps -a -q    ---to see all id of cotainer
+# docker exec -it <id> bash
+# docker commit <id> <image name>
+# docker run -d -v /home/data:/var/lib/mysql --name mariadb -e MARIADB_ROOT_PASSWORD=redhat123
+# docker volume ls
+# docker network ls
+# docker network create <nt name>    ---creates bridge ntwork
+# docker run -p 27017:27017 -d -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=password --name mongodb --net <network>  
+
+# docker logs <id>
+# docker log <id> | tail
+# docker logs <id> -f    ---stream the log contineousy
+
+sudo docker build -t new-image .
+
+sudo docker run -it --name my-new-container new-image 
+
+sudo docker tag new-image kailas54321/my-app:v1
+   56  docker push kailas54321/my-app:v1
+   57  sudo docker push kailas54321/my-app:v1
+--------------------------------------------
+
+Docker compose
+
+need to install docker compose:
+# docker-compose -f <yaml file> up   ---
+# docker-compose -f <yaml> down
+# 
+
+sed -n 3 print <file name>
+
+Docker networking:
+
+# docker create my network    ---create the user define bridge nt
+# docker network connect my-net my-nginx    ---my-nginx container will connect to this nt
+# docker network create --help
+# docker network rm
+# docker create --name my-nginx \
+  --network my-net \
+  --publish 8080:80 \
+  nginx:latest
+
+# docker network disconnect my-net my-nginx
+
+overlay nt:
+# 
+# sudo docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <cont_id>   to get docker ip
+
+# https://medium.com/geekculture/webapp-nginx-and-ssl-in-docker-compose-6d02bdbe8fa0    ---ssl certificate attach block
+
+
+# docker run --rm -v nginx-certs:/certs -v /home/deq/Devops/k8s/nginx-docker/ssl:/certificates cert-nginx sh -c "cp /certificates/*.crt /certs && cp /certificates/*.key /certs"   ----to mount docker volume
+# docker run -d --name nginx-container-a -p 89:80 -p 443:443 -v nginx-certs:/etc/nginx/certs cert-nginx  ---after creating volume run this command
+
+# ifconfig | grep 192.168
